@@ -20,6 +20,7 @@ Run it:
 from __future__ import annotations
 
 import io
+import os
 import uuid
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
@@ -28,15 +29,18 @@ from fastapi.responses import StreamingResponse
 
 from backend import approvals
 from dashboard import data
+from pipelines import PIPELINES
 from refine.engine import refine_file, to_bytes
 from utils import database
 
 app = FastAPI(title="SENTINEL API", version="1.0.0")
 
-# Dev CORS: the Vite dev server runs on 5173. Tighten for production.
+# CORS: the Vite dev server by default; in production set ALLOWED_ORIGINS to the
+# deployed frontend (comma-separated), e.g. https://sentinel-eight-chi.vercel.app
+_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[o.strip().rstrip("/") for o in _ORIGINS.split(",") if o.strip()],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
@@ -49,6 +53,17 @@ _REFINED: dict[str, tuple[str, bytes]] = {}
 @app.on_event("startup")
 def _startup() -> None:
     database.init_db()
+    _seed_if_empty()
+
+
+def _seed_if_empty(runs_per_pipeline: int = 3) -> None:
+    """A fresh deploy has an empty DB. Seed a few clean runs per pipeline so the
+    Monitor has a row-count baseline (otherwise row-count anomalies go unseen)."""
+    if database.recent_runs(limit=1):
+        return
+    for cls in PIPELINES.values():
+        for _ in range(runs_per_pipeline):
+            cls().run()
 
 
 @app.get("/api/health")

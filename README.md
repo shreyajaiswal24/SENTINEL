@@ -73,6 +73,17 @@ Medium/high-risk incidents **pause** the LangGraph run at the HITL node
 API: `GET /api/approvals`, `POST /api/approvals/{id}/approve|reject`,
 `POST /api/approvals/approve-all`, `POST /api/simulate` (see `backend/approvals.py`).
 
+## Deploy
+
+* **Frontend → Vercel:** import the repo with Root Directory `frontend` (Vite preset) and
+  set `VITE_API_BASE` to the API URL. No secrets here — `VITE_*` values are public.
+* **API → Render:** New → Blueprint → this repo (`render.yaml`); enter `GROQ_API_KEY`.
+  Set `ALLOWED_ORIGINS` to the Vercel URL. A fresh (empty) DB is seeded with clean
+  runs on startup. The free plan's disk is ephemeral, so data resets on redeploy.
+
+The API is a long-running server (SQLite, LangGraph checkpoints, background
+simulation), so it needs a host like Render rather than serverless functions.
+
 ## Refine your data (bring-your-own-data)
 
 Upload a real sales file on the dashboard and get a cleaned one back. SENTINEL
