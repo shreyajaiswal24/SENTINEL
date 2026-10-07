@@ -1,0 +1,25 @@
+# --- Phase 1: pipelines + database ---
+Faker>=24.0.0
+
+# --- Phase 2: Monitor agent (LangGraph node) ---
+langgraph>=0.2.0
+langgraph-checkpoint-sqlite>=2.0.0   # dashboard approvals: pause/resume the graph
+
+# --- Phase 3: Diagnose agent (LLM) — OpenAI first, Groq fallback ---
+langchain-openai>=0.1.0
+langchain-groq>=0.1.0
+python-dotenv>=1.0.0
+# langsmith>=0.1.0
+
+# --- Phase 6/8: Voice HITL (ElevenLabs cloud TTS + STT) ---
+elevenlabs>=1.0.0
+# sounddevice>=0.4.6   # mic capture for real voice mode (needs PortAudio)
+
+# --- Phase 9: UI — FastAPI backend (React/Vite frontend lives in frontend/) ---
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9   # file uploads for the refine endpoint
+
+# --- Refine (bring-your-own-data): verify + clean uploaded sales CSV/Excel ---
+pandas>=2.0.0
+openpyxl>=3.1.0           # Excel (.xlsx) read/write
