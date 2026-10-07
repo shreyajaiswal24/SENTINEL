@@ -21,5 +21,5 @@ uvicorn[standard]>=0.29.0
 python-multipart>=0.0.9   # file uploads for the refine endpoint
 
 # --- Refine (bring-your-own-data): verify + clean uploaded sales CSV/Excel ---
-pandas>=2.0.0
+pandas>=2.1.0
 openpyxl>=3.1.0           # Excel (.xlsx) read/write

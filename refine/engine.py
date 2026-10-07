@@ -133,7 +133,7 @@ def refine_dataframe(df: pd.DataFrame, filename: str = "upload") -> tuple[pd.Dat
     # --- 3. Null / missing values ------------------------------------------
     present_critical = [c for c in CRITICAL_COLUMNS if c in df.columns]
     if present_critical:
-        blank_mask = df[present_critical].applymap(_blank).any(axis=1)
+        blank_mask = df[present_critical].map(_blank).any(axis=1)
         n_bad = int(blank_mask.sum())
         if n_bad:
             df = df[~blank_mask].reset_index(drop=True)
@@ -146,7 +146,7 @@ def refine_dataframe(df: pd.DataFrame, filename: str = "upload") -> tuple[pd.Dat
     # non-critical nulls: report only, don't drop
     noncritical = [c for c in df.columns if c not in CRITICAL_COLUMNS]
     if noncritical:
-        nc_nulls = int(df[noncritical].applymap(_blank).sum().sum())
+        nc_nulls = int(df[noncritical].map(_blank).sum().sum())
         if nc_nulls:
             issues.append(Issue(
                 "nulls", "info",
